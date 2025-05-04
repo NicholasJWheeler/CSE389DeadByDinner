@@ -24,7 +24,7 @@ public:
 
 protected:
   // Used for querying survivors by zombies
-  static std::vector<AControllableSurvivor*> Survivors;
+  inline static std::vector<AControllableSurvivor*> Survivors = std::vector<AControllableSurvivor*>();
 
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -177,6 +177,5 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Weapon")
 	void SetShotgunEquipped(bool Equipped);
 
-  UFUNCTION(BlueprintCallable, Category = "Survivors")
   static const std::vector<AControllableSurvivor*>& GetSurvivorList();
 };

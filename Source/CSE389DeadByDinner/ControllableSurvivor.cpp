@@ -28,7 +28,6 @@ AControllableSurvivor::AControllableSurvivor()
 	UnarmedEquipped = false;
 	PistolEquipped = true;
 	ShotgunEquipped = false;
-	
 
 }
 
@@ -331,4 +330,7 @@ void AControllableSurvivor::AddChickenCollected(int ChickenCollectedToAdd)
 	ChickenCollected += ChickenCollectedToAdd;
 }
 
-
+const std::vector<AControllableSurvivor*>& AControllableSurvivor::GetSurvivorList()
+{
+  return Survivors;
+}

@@ -4,6 +4,8 @@
 #include "BasicZombie.h"
 #include "CSE389DeadByDinner/ControllableSurvivor.h"
 #include "GameFramework/Actor.h"
+#include "Components/BoxComponent.h"
+#include "AITypes.h"
 #include <algorithm>
 #include <vector>
 
@@ -13,13 +15,26 @@ ABasicZombie::ABasicZombie()
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+  PlayerAttackCollision =
+    CreateDefaultSubobject<UBoxComponent>(TEXT("Zombie Attack Collision"));
+  PlayerAttackCollision->SetupAttachment(RootComponent);
+  
+  Health = 100;
+
 }
 
 // Called when the game starts or when spawned
-void ABasicZombie::BeginPlay()
+void ABasicZombie::BeginPlay() 
 {
 	Super::BeginPlay();
-	
+
+	// For controlling when something hits the character
+	CollisionComp = FindComponentByClass<UCapsuleComponent>();
+
+	if (CollisionComp)
+	{
+		CollisionComp->OnComponentHit.AddDynamic(this, &ABasicZombie::OnHit);
+	}
 }
 
 // Called every frame
@@ -65,4 +80,16 @@ void ABasicZombie::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
 }
+
+void ABasicZombie::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& Hit)
+{
+	// Need to probably change this to get accurate player damage taken
+	if (OtherComponent->GetCollisionProfileName().ToString() == "Projectile") {
+		Health -= 10;
+		UE_LOG(LogTemp, Warning, TEXT("Other component is enemy!"), Health);
+	}
+
+	UE_LOG(LogTemp, Warning, TEXT("Health: %d"), Health);
+}
+
 

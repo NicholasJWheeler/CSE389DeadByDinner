@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "Components/BoxComponent.h"
 #include "BasicZombie.generated.h"
 
 UCLASS()
@@ -18,6 +19,11 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+  
+	UCapsuleComponent* CollisionComp;
+
+  UPROPERTY(EditAnywhere)
+  UBoxComponent* PlayerAttackCollision;
 
   bool CanAttackPlayer;
 
@@ -27,11 +33,27 @@ protected:
   // Last player to attack zombie
   class AControllableSurvivor* LastAttackedBy;
 
-  float Health;
+  UPROPERTY(EditAnywhere)
+  float StoppingDistance = 50.0f;
+
+  UFUNCTION()
+  void MoveToPlayer();
+
+  UFUNCTION()
+  void SeekPlayer();
+
+  UFUNCTION()
+  void StopSeekingPlayer();
+
+  int32 Health;
+  int32 Speed;
 
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+
+  UFUNCTION()
+	void OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& Hit);
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
