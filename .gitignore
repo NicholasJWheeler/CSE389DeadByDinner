@@ -1,6 +1,10 @@
 # Visual Studio 2015 user specific files
 .vs/
 
+# VS Code Files
+.vscode/
+CSE389DeadByDinner.code-workspace
+
 # Compiled Object files
 *.slo
 *.lo

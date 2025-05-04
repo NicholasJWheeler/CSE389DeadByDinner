@@ -2,6 +2,7 @@
 
 
 #include "ControllableSurvivor.h"
+#include "Engine/LocalPlayer.h"
 #include "InputMappingContext.h"
 #include "EnhancedInputSubsystems.h"
 #include "Math/Plane.h" 
