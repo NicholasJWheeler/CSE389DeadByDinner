@@ -45,6 +45,8 @@ void AControllableSurvivor::BeginPlay()
 		CollisionComp->OnComponentHit.AddDynamic(this, &AControllableSurvivor::OnHit);
 	}
 
+  Survivors.push_back(this);
+
 }
 
 // Called every frame
@@ -187,7 +189,7 @@ void AControllableSurvivor::Shoot()
 	// Set ProjectileSpawn to spawn projectiles slightly in front of the character
 	//ProjectileSpawn.Set(100.0f, 0.0f, 0.0f);
 
-	//// Transform ProjectileSpwan from local space to world space.
+	//// Transform ProjectileSpawn from local space to world space.
 	//FVector SpawnLocation = GetActorLocation() + FTransform(GetActorRotation()).TransformVector(ProjectileSpawn);
 
 	//// Skew the aim to be slightly upwards.

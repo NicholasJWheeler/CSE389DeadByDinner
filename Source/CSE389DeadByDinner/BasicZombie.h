@@ -19,6 +19,16 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+  bool CanAttackPlayer;
+
+  // Player that has the aggression focus
+  class AControllableSurvivor* AggroPlayer;
+
+  // Last player to attack zombie
+  class AControllableSurvivor* LastAttackedBy;
+
+  float Health;
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;

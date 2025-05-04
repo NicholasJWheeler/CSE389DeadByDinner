@@ -7,6 +7,7 @@
 #include "InputActionValue.h"
 #include "InputAction.h"
 #include "Components/CapsuleComponent.h"
+#include <vector>
 #include "ControllableSurvivor.generated.h"
 
 UCLASS()
@@ -22,6 +23,9 @@ public:
 	USoundBase* CollectSound;
 
 protected:
+  // Used for querying survivors by zombies
+  static std::vector<AControllableSurvivor*> Survivors;
+
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
@@ -173,4 +177,6 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Weapon")
 	void SetShotgunEquipped(bool Equipped);
 
+  UFUNCTION(BlueprintCallable, Category = "Survivors")
+  static const std::vector<AControllableSurvivor*>& GetSurvivorList();
 };

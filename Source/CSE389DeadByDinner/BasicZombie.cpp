@@ -2,6 +2,10 @@
 
 
 #include "BasicZombie.h"
+#include "CSE389DeadByDinner/ControllableSurvivor.h"
+#include "GameFramework/Actor.h"
+#include <algorithm>
+#include <vector>
 
 // Sets default values
 ABasicZombie::ABasicZombie()
@@ -22,6 +26,36 @@ void ABasicZombie::BeginPlay()
 void ABasicZombie::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+  if (AggroPlayer == nullptr) {
+    // List of all survivors
+    std::vector<AControllableSurvivor*> survivors = AControllableSurvivor::GetSurvivorList();
+    if (survivors.size() > 0) {
+      // Candidates that meet given requirements
+      std::vector<AControllableSurvivor*> candidates;
+
+      // Gathers candidate survivors
+      std::for_each(survivors.begin(), survivors.end(), [&candidates](auto& x){
+        if (x->GetHealth() > 0) {
+          candidates.push_back(x);
+        }
+      });
+
+      if (candidates.size() > 0) {
+        // Sorts candidates by distance
+        std::sort(candidates.begin(), candidates.end(), [this](auto& a, auto& b) -> bool {
+          return (a->GetActorLocation() - this->GetActorLocation()).Size() > (b->GetActorLocation() - this->GetActorLocation()).Size();
+        });
+
+        // Puts aggro onto nearest candidate
+        AggroPlayer = candidates[0];
+      }
+    }
+  } else {
+    // Set aggro on last player to attack zombie
+    if (LastAttackedBy != nullptr) {
+      AggroPlayer = LastAttackedBy;
+    }
+  }
 
 }
 
