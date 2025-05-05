@@ -177,5 +177,8 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Weapon")
 	void SetShotgunEquipped(bool Equipped);
 
+  // Get list of all Survivors in the game
   static const std::vector<AControllableSurvivor*>& GetSurvivorList();
+
+  void DealDamage(int32 Damage, const char16_t* DamageSource);
 };

@@ -3,10 +3,12 @@
 
 #include "BasicZombie.h"
 #include "CSE389DeadByDinner/ControllableSurvivor.h"
+#include "Engine/World.h"
 #include "GameFramework/Actor.h"
 #include "Components/BoxComponent.h"
 #include "AITypes.h"
 #include "Navigation/PathFollowingComponent.h"
+#include "TimerManager.h"
 #include "ZombieAIController.h"
 #include <algorithm>
 #include <vector>
@@ -18,7 +20,7 @@ ABasicZombie::ABasicZombie()
 	PrimaryActorTick.bCanEverTick = true;
   
   Health = 100;
-  CanAttackPlayer = false;
+  CanAttackPlayer = true;
 
 }
 
@@ -33,7 +35,13 @@ void ABasicZombie::BeginPlay()
 	if (CollisionComp)
 	{
 		CollisionComp->OnComponentHit.AddDynamic(this, &ABasicZombie::OnHit);
-    PlayerAttackCollision = Cast<UBoxComponent>(CollisionComp->GetDefaultSubobjectByName(TEXT("Player Attack Collision")));
+    PlayerAttackCollision = FindComponentByClass<UBoxComponent>();
+    if (PlayerAttackCollision) {
+      PlayerAttackCollision->OnComponentBeginOverlap.AddDynamic(this, &ABasicZombie::OnPlayerAttackOverlapBegin);
+      PlayerAttackCollision->OnComponentEndOverlap.AddDynamic(this, &ABasicZombie::OnPlayerAttackOverlapEnd);
+    } else {
+      UE_LOG(LogTemp, Warning, TEXT("Could not add AttackCollision Dynamic Methods"));
+    }
 	}
 
   AIController = Cast<AZombieAIController>(GetController());
@@ -98,13 +106,12 @@ void ABasicZombie::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, 
 		UE_LOG(LogTemp, Warning, TEXT("Other component is enemy!"), Health);
 	}
 
-	UE_LOG(LogTemp, Warning, TEXT("Health: %d"), Health);
+	// UE_LOG(LogTemp, Warning, TEXT("Health: %d"), Health);
 }
 
 void ABasicZombie::MoveToPlayer()
 {
-  if (AggroPlayer && AggroPlayer != nullptr
-    && AIController && AIController != nullptr) {
+  if (AggroPlayer && AIController) {
     AIController->MoveToLocation(AggroPlayer->GetActorLocation(), StoppingDistance, true);
   }
 }
@@ -112,7 +119,6 @@ void ABasicZombie::MoveToPlayer()
 void ABasicZombie::SeekPlayer()
 {
   MoveToPlayer();
-
 }
 
 void ABasicZombie::StopSeekingPlayer()
@@ -122,4 +128,31 @@ void ABasicZombie::StopSeekingPlayer()
 
 void ABasicZombie::OnAIMoveCompleted(struct FAIRequestID, const struct FPathFollowingResult& Result)
 {
+  StopSeekingPlayer();
+}
+
+void ABasicZombie::OnPlayerAttackOverlapBegin(class UPrimitiveComponent* OverlappedComp,
+  class AActor* OtherActor, class UPrimitiveComponent* OtherComp,
+  int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+  if (OtherActor == AggroPlayer && !DisableAI) {
+    // UE_LOG(LogTemp, Warning, TEXT("Attack Collision Overlapping with Survivor"));
+    GetWorld()->GetTimerManager().SetTimer(AttackCooldown, this,
+      &ABasicZombie::AttackPlayer, 1.0f, true);
+  }
+}
+
+void ABasicZombie::OnPlayerAttackOverlapEnd(class UPrimitiveComponent* OverlappedComp,
+  class AActor* OtherActor, class UPrimitiveComponent* OtherComp,
+  int32 OtherBodyIndex)
+{
+  GetWorld()->GetTimerManager().ClearTimer(AttackCooldown);
+}
+
+void ABasicZombie::AttackPlayer()
+{
+  // UE_LOG(LogTemp, Warning, TEXT("Attempting to attack survivor"));
+  if (CanAttackPlayer && AggroPlayer) {
+    AggroPlayer->DealDamage(10, TEXT("Basic Zombie"));
+  }
 }

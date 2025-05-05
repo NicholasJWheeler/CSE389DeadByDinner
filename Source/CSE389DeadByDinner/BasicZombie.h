@@ -23,9 +23,6 @@ protected:
   
 	UCapsuleComponent* CollisionComp;
 
-  UPROPERTY(EditAnywhere)
-  UBoxComponent* PlayerAttackCollision;
-
   class AZombieAIController* AIController;
   
   void OnAIMoveCompleted(struct FAIRequestID,
@@ -55,7 +52,24 @@ protected:
   int32 Health;
   int32 Speed;
 
+  UPROPERTY(EditAnywhere)
+  UBoxComponent* PlayerAttackCollision;
+
+  UFUNCTION()
+  void OnPlayerAttackOverlapBegin(class UPrimitiveComponent* OverlappedComp,
+    class AActor* OtherActor, class UPrimitiveComponent* OtherComp,
+    int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
+    UFUNCTION()
+    void OnPlayerAttackOverlapEnd(class UPrimitiveComponent* OverlappedComp,
+      class AActor* OtherActor, class UPrimitiveComponent* OtherComp,
+      int32 OtherBodyIndex);
+
   bool CanAttackPlayer;
+
+  FTimerHandle AttackCooldown;
+
+  void AttackPlayer();
 
 public:	
 	// Called every frame

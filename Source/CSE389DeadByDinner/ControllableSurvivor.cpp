@@ -5,6 +5,7 @@
 #include "Engine/LocalPlayer.h"
 #include "InputMappingContext.h"
 #include "EnhancedInputSubsystems.h"
+#include "Logging/LogMacros.h"
 #include "Math/Plane.h" 
 #include "Math/UnrealMathUtility.h" // for cursor position rotation
 #include "EnhancedInputComponent.h"
@@ -135,7 +136,7 @@ void AControllableSurvivor::OnHit(UPrimitiveComponent* HitComponent, AActor* Oth
 		UE_LOG(LogTemp, Warning, TEXT("Other component is enemy!"), Health);
 	}
 
-	UE_LOG(LogTemp, Warning, TEXT("Health: %d"), Health);
+	// UE_LOG(LogTemp, Warning, TEXT("Health: %d"), Health);
 }
 
 void AControllableSurvivor::Move(const FInputActionValue& Value)
@@ -333,4 +334,10 @@ void AControllableSurvivor::AddChickenCollected(int ChickenCollectedToAdd)
 const std::vector<AControllableSurvivor*>& AControllableSurvivor::GetSurvivorList()
 {
   return Survivors;
+}
+
+void AControllableSurvivor::DealDamage(int32 Damage, const char16_t* DamageSource)
+{
+  Health -= Damage;
+  UE_LOG(LogTemp, Warning, TEXT("Took %d damage from %s"), Damage, DamageSource);
 }
