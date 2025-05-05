@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include "CSE389DeadByDinner/ZombieAIController.h"
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "Components/BoxComponent.h"
@@ -25,7 +26,10 @@ protected:
   UPROPERTY(EditAnywhere)
   UBoxComponent* PlayerAttackCollision;
 
-  bool CanAttackPlayer;
+  class AZombieAIController* AIController;
+  
+  void OnAIMoveCompleted(struct FAIRequestID,
+                        const struct FPathFollowingResult& Result);
 
   // Player that has the aggression focus
   class AControllableSurvivor* AggroPlayer;
@@ -47,6 +51,8 @@ protected:
 
   int32 Health;
   int32 Speed;
+
+  bool CanAttackPlayer;
 
 public:	
 	// Called every frame

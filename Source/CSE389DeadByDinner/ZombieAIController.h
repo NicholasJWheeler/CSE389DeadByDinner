@@ -14,4 +14,13 @@ class CSE389DEADBYDINNER_API AZombieAIController : public AAIController
 {
 	GENERATED_BODY()
 	
+public:
+  void BeginPlay() override;
+
+private:
+
+  class UNavigationSystemV1* NavArea;
+
+public:
+
 };

@@ -6,6 +6,8 @@
 #include "GameFramework/Actor.h"
 #include "Components/BoxComponent.h"
 #include "AITypes.h"
+#include "Navigation/PathFollowingComponent.h"
+#include "ZombieAIController.h"
 #include <algorithm>
 #include <vector>
 
@@ -20,6 +22,7 @@ ABasicZombie::ABasicZombie()
   PlayerAttackCollision->SetupAttachment(RootComponent);
   
   Health = 100;
+  CanAttackPlayer = false;
 
 }
 
@@ -35,13 +38,16 @@ void ABasicZombie::BeginPlay()
 	{
 		CollisionComp->OnComponentHit.AddDynamic(this, &ABasicZombie::OnHit);
 	}
+
+  AIController = Cast<AZombieAIController>(GetController());
+  AIController->GetPathFollowingComponent()->OnRequestFinished.AddUObject(this, &ABasicZombie::OnAIMoveCompleted);
 }
 
 // Called every frame
 void ABasicZombie::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-  if (AggroPlayer == nullptr) {
+  if (AggroPlayer == nullptr || !AggroPlayer) {
     // List of all survivors
     std::vector<AControllableSurvivor*> survivors = AControllableSurvivor::GetSurvivorList();
     if (survivors.size() > 0) {
@@ -67,8 +73,12 @@ void ABasicZombie::Tick(float DeltaTime)
     }
   } else {
     // Set aggro on last player to attack zombie
-    if (LastAttackedBy != nullptr) {
+    if (LastAttackedBy) {
       AggroPlayer = LastAttackedBy;
+    }
+
+    if (this) {
+      SeekPlayer();
     }
   }
 
@@ -92,4 +102,25 @@ void ABasicZombie::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, 
 	UE_LOG(LogTemp, Warning, TEXT("Health: %d"), Health);
 }
 
+void ABasicZombie::MoveToPlayer()
+{
+  if (AggroPlayer && AggroPlayer != nullptr
+    && AIController && AIController != nullptr) {
+    AIController->MoveToLocation(AggroPlayer->GetActorLocation(), StoppingDistance, true);
+  }
+}
 
+void ABasicZombie::SeekPlayer()
+{
+  MoveToPlayer();
+
+}
+
+void ABasicZombie::StopSeekingPlayer()
+{
+  AIController->StopMovement();
+}
+
+void ABasicZombie::OnAIMoveCompleted(struct FAIRequestID, const struct FPathFollowingResult& Result)
+{
+}

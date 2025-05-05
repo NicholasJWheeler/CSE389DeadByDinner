@@ -2,4 +2,12 @@
 
 
 #include "ZombieAIController.h"
+#include "NavigationSystem.h"
 
+void AZombieAIController::BeginPlay()
+{
+  Super::BeginPlay();
+
+  NavArea = FNavigationSystem::GetCurrent<UNavigationSystemV1>(this);
+
+}
