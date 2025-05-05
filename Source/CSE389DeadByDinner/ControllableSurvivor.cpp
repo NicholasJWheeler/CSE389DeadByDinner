@@ -216,6 +216,11 @@ int AControllableSurvivor::GetScore()
 	return Score;
 }
 
+int AControllableSurvivor::GetChickenCollected()
+{
+	return ChickenCollected;
+}
+
 int AControllableSurvivor::GetHealth()
 {
 	return Health;
@@ -311,6 +316,16 @@ void AControllableSurvivor::SetScore(int NewScore)
 void AControllableSurvivor::AddScore(int ScoreToAdd)
 {
 	Score += ScoreToAdd;
+}
+
+void AControllableSurvivor::SetChickenCollected(int NewChickenCollected)
+{
+	ChickenCollected = NewChickenCollected;
+}
+
+void AControllableSurvivor::AddChickenCollected(int ChickenCollectedToAdd)
+{
+	ChickenCollected += ChickenCollectedToAdd;
 }
 
 

@@ -18,6 +18,9 @@ public:
 	// Sets default values for this character's properties
 	AControllableSurvivor();
 
+	UPROPERTY(EditAnywhere, Category = "Audio")
+	USoundBase* CollectSound;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -39,6 +42,9 @@ protected:
 
 	// Score variable updated when we shoot an enemy
 	int Score;
+
+	// Collectible variable updated when we obtain chicken nuggets
+	int CollectScore;
 
 	// Health variable updated when we get hit by an 'enemy'
 	int32 Health;
@@ -73,6 +79,8 @@ public:
 	// Function that handles firing projectiles
 	void Shoot();
 
+	// SCORE
+
 	// Set the score variable
 	UFUNCTION(BlueprintCallable, Category = "Score")
 	void SetScore(int NewScore);
@@ -83,6 +91,19 @@ public:
 	// Get the score variable
 	UFUNCTION(BlueprintCallable, Category = "Score")
 	int GetScore();
+
+	// CHICKEN COLLECTED
+
+	UFUNCTION(BlueprintCallable, Category = "Score")
+	void SetChickenCollected(int NewChickenCollected);
+
+	UFUNCTION(BlueprintCallable, Category = "Score")
+	void AddChickenCollected(int ChickenCollectedToAdd);
+
+	UFUNCTION(BlueprintCallable, Category = "Score")
+	int GetChickenCollected();
+
+	// HEALTH
 
 	// Get the health variable
 	UFUNCTION(BlueprintCallable, Category = "Health")
