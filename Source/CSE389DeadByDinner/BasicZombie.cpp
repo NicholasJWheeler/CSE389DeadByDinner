@@ -16,10 +16,6 @@ ABasicZombie::ABasicZombie()
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-
-  PlayerAttackCollision =
-    CreateDefaultSubobject<UBoxComponent>(TEXT("Zombie Attack Collision"));
-  PlayerAttackCollision->SetupAttachment(RootComponent);
   
   Health = 100;
   CanAttackPlayer = false;
@@ -37,6 +33,7 @@ void ABasicZombie::BeginPlay()
 	if (CollisionComp)
 	{
 		CollisionComp->OnComponentHit.AddDynamic(this, &ABasicZombie::OnHit);
+    PlayerAttackCollision = Cast<UBoxComponent>(CollisionComp->GetDefaultSubobjectByName(TEXT("Player Attack Collision")));
 	}
 
   AIController = Cast<AZombieAIController>(GetController());
@@ -71,7 +68,7 @@ void ABasicZombie::Tick(float DeltaTime)
         AggroPlayer = candidates[0];
       }
     }
-  } else {
+  } else if (!DisableAI) {
     // Set aggro on last player to attack zombie
     if (LastAttackedBy) {
       AggroPlayer = LastAttackedBy;
@@ -80,6 +77,8 @@ void ABasicZombie::Tick(float DeltaTime)
     if (this) {
       SeekPlayer();
     }
+  } else {
+    StopSeekingPlayer();
   }
 
 }

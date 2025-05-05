@@ -49,6 +49,9 @@ protected:
   UFUNCTION()
   void StopSeekingPlayer();
 
+  UPROPERTY(EditAnywhere)
+  bool DisableAI;
+
   int32 Health;
   int32 Speed;
 
