@@ -2,6 +2,7 @@
 
 
 #include "BasicZombie.h"
+#include "CSE389DeadByDinner/BasicProjectile.h"
 #include "CSE389DeadByDinner/ControllableSurvivor.h"
 #include "Engine/World.h"
 #include "GameFramework/Actor.h"
@@ -95,15 +96,14 @@ void ABasicZombie::Tick(float DeltaTime)
 void ABasicZombie::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
-
 }
 
 void ABasicZombie::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& Hit)
 {
 	// Need to probably change this to get accurate player damage taken
-	if (OtherComponent->GetCollisionProfileName().ToString() == "Projectile") {
-		Health -= 10;
-		UE_LOG(LogTemp, Warning, TEXT("Other component is enemy!"), Health);
+  ABasicProjectile* projectile = Cast<ABasicProjectile>(OtherActor);
+	if (projectile) {
+		Health -= projectile->GetDamageDealt(this);
 	}
 
 	// UE_LOG(LogTemp, Warning, TEXT("Health: %d"), Health);
@@ -138,7 +138,7 @@ void ABasicZombie::OnPlayerAttackOverlapBegin(class UPrimitiveComponent* Overlap
   if (OtherActor == AggroPlayer && !DisableAI) {
     // UE_LOG(LogTemp, Warning, TEXT("Attack Collision Overlapping with Survivor"));
     GetWorld()->GetTimerManager().SetTimer(AttackCooldown, this,
-      &ABasicZombie::AttackPlayer, 1.0f, true);
+      &ABasicZombie::AttackPlayer, 1.0f, true, 0.5f);
   }
 }
 
