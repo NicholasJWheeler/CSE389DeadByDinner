@@ -336,8 +336,9 @@ const std::vector<AControllableSurvivor*>& AControllableSurvivor::GetSurvivorLis
   return Survivors;
 }
 
-void AControllableSurvivor::DealDamage(int32 Damage, const char16_t* DamageSource)
+void AControllableSurvivor::DealDamage(int32 Damage, FString DamageSource)
 {
-  Health -= Damage;
-  UE_LOG(LogTemp, Warning, TEXT("Took %d damage from %s"), Damage, DamageSource);
+    Health -= Damage;
+    std::string out = std::string(TCHAR_TO_UTF8(*DamageSource));
+    UE_LOG(LogTemp, Warning, TEXT("Took %d damage from %s"), Damage, *FString(out.c_str()));
 }

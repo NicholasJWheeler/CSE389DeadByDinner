@@ -180,5 +180,5 @@ public:
   // Get list of all Survivors in the game
   static const std::vector<AControllableSurvivor*>& GetSurvivorList();
 
-  void DealDamage(int32 Damage, const char16_t* DamageSource);
+  void DealDamage(int32 Damage, FString DamageSource);
 };
