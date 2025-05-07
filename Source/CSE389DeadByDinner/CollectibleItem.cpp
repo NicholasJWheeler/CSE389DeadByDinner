@@ -2,6 +2,8 @@
 
 
 #include "CollectibleItem.h"
+#include "Components/StaticMeshComponent.h"
+#include "UObject/ConstructorHelpers.h"
 #include "ControllableSurvivor.h"
 #include "Kismet/GameplayStatics.h"
 
