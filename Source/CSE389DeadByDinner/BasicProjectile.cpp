@@ -20,8 +20,6 @@ ABasicProjectile::ABasicProjectile()
   CollisionComp->InitSphereRadius(DamageRadius);
 
   RootComponent = CollisionComp;
-
-  InitialLocation = Owner->GetActorLocation();
 }
 
 // Called when the game starts or when spawned
@@ -49,4 +47,5 @@ void ABasicProjectile::AddScoreFromZombie(int32 Score)
 void ABasicProjectile::Fire(FVector Direction, AControllableSurvivor* owner)
 {
   Owner = owner;
+  InitialLocation = Owner->GetActorLocation();
 }
