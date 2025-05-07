@@ -21,24 +21,36 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-  UPROPERTY(VisibleDefaultsOnly)
-  UStaticMeshComponent* MeshComp;
+	UPROPERTY(VisibleDefaultsOnly)
+	UStaticMeshComponent* MeshComp;
 
-  UPROPERTY(VisibleAnywhere)
-  UProjectileMovementComponent* PMComp;
+	UPROPERTY(VisibleAnywhere)
+	UProjectileMovementComponent* PMComp;
 
-  class AControllableSurvivor* Owner;
+	class AControllableSurvivor* Owner;
+
+	UPROPERTY(VisibleDefaultsOnly)
+    USphereComponent* CollisionComp;
+	
+	UPROPERTY(EditAnywhere)
+	int32 BaseDamage = 25;
+
+	UPROPERTY(EditAnywhere)
+    float DamageFallOff = 0.08f / 100.0f;
+	
+	UPROPERTY(EditAnywhere)
+	FVector InitialLocation;
+
+	UPROPERTY(EditAnywhere)
+    float DamageRadius = 15.0f;
 
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-  virtual int32 GetDamageDealt(class ABasicZombie* zombie);
+	int32 GetDamageDealt(class ABasicZombie* zombie);
 
-  virtual void AddScoreFromZombie(int32 Score);
+	void AddScoreFromZombie(int32 Score);
 
-  virtual void Fire(FVector Direction, class AControllableSurvivor* owner);
-
-  virtual void Init();
-
+	void Fire(FVector Direction, class AControllableSurvivor* owner);
 };
