@@ -15,16 +15,13 @@ ABasicProjectile::ABasicProjectile()
 
   RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("ProjectileSceneComponent"));
 
-  MeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("PistolProjectileMeshComponent"));
-  static ConstructorHelpers::FObjectFinder<UStaticMesh>Mesh(TEXT("/Game/Assets/BlasterPack/bullet-foam-tip.bullet-foam-tip"));
-  if (Mesh.Succeeded()) {
-    MeshComp->SetStaticMesh(Mesh.Object);
-    MeshComp->SetupAttachment(RootComponent);
-  }
-}
+  CollisionComp = CreateDefaultSubobject<USphereComponent>(TEXT("SphereComponent"));
 
-void ABasicProjectile::Init()
-{
+  CollisionComp->InitSphereRadius(DamageRadius);
+
+  RootComponent = CollisionComp;
+
+  InitialLocation = Owner->GetActorLocation();
 }
 
 // Called when the game starts or when spawned
