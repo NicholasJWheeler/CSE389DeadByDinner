@@ -67,6 +67,11 @@ protected:
 	bool PistolEquipped;
 	bool ShotgunEquipped;
 
+	// Tracking what weapons can be switched to
+    bool OwnsUnarmed;
+    bool OwnsPistol;
+    bool OwnsShotgun;
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -176,6 +181,32 @@ public:
 	// Set the value of if Shotgun is equipped
 	UFUNCTION(BlueprintCallable, Category = "Weapon")
 	void SetShotgunEquipped(bool Equipped);
+
+	// Weapon ownership/inventory
+	
+	// Get the value of if Unarmed is owned
+    UFUNCTION(BlueprintCallable, Category = "Weapon")
+    bool GetOwnsUnarmed();
+
+    // Set the value of if Unarmed is owned
+    UFUNCTION(BlueprintCallable, Category = "Weapon")
+    void SetOwnsUnarmed(bool Owned);
+
+	// Get the value of if Pistol is owned
+    UFUNCTION(BlueprintCallable, Category = "Weapon")
+    bool GetOwnsPistol();
+
+    // Set the value of if Pistol is owned
+    UFUNCTION(BlueprintCallable, Category = "Weapon")
+    void SetOwnsPistol(bool Owned);
+
+	// Get the value of if Shotgun is owned
+    UFUNCTION(BlueprintCallable, Category = "Weapon")
+    bool GetOwnsShotgun();
+
+    // Set the value of if Shotgun is owned
+    UFUNCTION(BlueprintCallable, Category = "Weapon")
+    void SetOwnsShotgun(bool Owned);
 
   // Get list of all Survivors in the game
   static const std::vector<AControllableSurvivor*>& GetSurvivorList();

@@ -6,6 +6,7 @@
 #include "InputMappingContext.h"
 #include "EnhancedInputSubsystems.h"
 #include "Logging/LogMacros.h"
+#include "Kismet/GameplayStatics.h"
 #include "Math/Plane.h" 
 #include "Math/UnrealMathUtility.h" // for cursor position rotation
 #include "EnhancedInputComponent.h"
@@ -26,9 +27,14 @@ AControllableSurvivor::AControllableSurvivor()
 	ShotgunReserveAmmo = 0; // Start with no reserve shotgun ammo
 
 	// Starting weapon is nothing
-	UnarmedEquipped = false;
-	PistolEquipped = true;
+	UnarmedEquipped = true;
+	PistolEquipped = false;
 	ShotgunEquipped = false;
+
+	// Starting weapons owned/accessible
+    OwnsUnarmed = true;
+    OwnsPistol = false;
+    OwnsShotgun = false;
 
 }
 
@@ -307,7 +313,37 @@ bool AControllableSurvivor::GetShotgunEquipped()
 
 void AControllableSurvivor::SetShotgunEquipped(bool Equipped)
 {
-	ShotgunEquipped = Equipped;
+	ShotgunEquipped = Equipped; 
+}
+
+bool AControllableSurvivor::GetOwnsUnarmed() 
+{ 
+	return OwnsUnarmed; 
+}
+
+void AControllableSurvivor::SetOwnsUnarmed(bool Owned) 
+{ 
+	OwnsUnarmed = Owned; 
+}
+
+bool AControllableSurvivor::GetOwnsPistol() 
+{ 
+	return OwnsPistol; 
+}
+
+void AControllableSurvivor::SetOwnsPistol(bool Owned) 
+{ 
+	OwnsPistol = Owned; 
+}
+
+bool AControllableSurvivor::GetOwnsShotgun() 
+{ 
+	return OwnsShotgun; 
+}
+
+void AControllableSurvivor::SetOwnsShotgun(bool Owned) 
+{ 
+	OwnsShotgun = Owned; 
 }
 
 
@@ -341,4 +377,8 @@ void AControllableSurvivor::DealDamage(int32 Damage, FString DamageSource)
     Health -= Damage;
     std::string out = std::string(TCHAR_TO_UTF8(*DamageSource));
     UE_LOG(LogTemp, Warning, TEXT("Took %d damage from %s"), Damage, *FString(out.c_str()));
+    if (Health <= 0)
+    {
+        UGameplayStatics::OpenLevel(this, FName("FailLevel"));
+    }
 }
