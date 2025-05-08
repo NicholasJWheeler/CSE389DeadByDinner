@@ -66,6 +66,10 @@ protected:
       int32 OtherBodyIndex);
 
   bool CanAttackPlayer;
+  
+  // For animation purposes
+  UPROPERTY(EditAnywhere, BlueprintReadWrite)
+  bool CurrentlyAttackingPlayer;
 
   FTimerHandle AttackCooldown;
 

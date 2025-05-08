@@ -22,6 +22,7 @@ ABasicZombie::ABasicZombie()
   
   Health = 100;
   CanAttackPlayer = true;
+  CurrentlyAttackingPlayer = false;
 
 }
 
@@ -146,6 +147,7 @@ void ABasicZombie::OnPlayerAttackOverlapEnd(class UPrimitiveComponent* Overlappe
   class AActor* OtherActor, class UPrimitiveComponent* OtherComp,
   int32 OtherBodyIndex)
 {
+  CurrentlyAttackingPlayer = false; // Do not continuously keep the attacking animation
   GetWorld()->GetTimerManager().ClearTimer(AttackCooldown);
 }
 
@@ -153,6 +155,9 @@ void ABasicZombie::AttackPlayer()
 {
   // UE_LOG(LogTemp, Warning, TEXT("Attempting to attack survivor"));
   if (CanAttackPlayer && AggroPlayer) {
+    CurrentlyAttackingPlayer = true; // Start an attack animation
     AggroPlayer->DealDamage(10, TEXT("Basic Zombie"));
   }
+
+  //CurrentlyAttackingPlayer = false; // Do not continuously keep the attacking animation
 }
