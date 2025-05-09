@@ -18,7 +18,7 @@ AControllableSurvivor::AControllableSurvivor()
 	PrimaryActorTick.bCanEverTick = true;
 
 	// Initialize Variables
-	Score = 0; // Start with no points
+	Score = 0; // Start with no points (skulls = zombies killed)
 	ChickenCollected = 0; // Start with no food collected
 	Health = 100; // Start with full health
 	PistolLoadedAmmo = 0; // Start with no loaded pistol ammo
@@ -33,8 +33,8 @@ AControllableSurvivor::AControllableSurvivor()
 
 	// Starting weapons owned/accessible
     OwnsUnarmed = true;
-    OwnsPistol = false;
-    OwnsShotgun = false;
+    OwnsPistol = true;
+    OwnsShotgun = true;
 
 }
 
