@@ -10,7 +10,7 @@
 // Sets default values
 ABasicProjectile::ABasicProjectile()
 {
-	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	// Set this actor to call Tick() every frame.	You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = false;
 
 	RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("ProjectileSceneComponent"));
@@ -18,6 +18,11 @@ ABasicProjectile::ABasicProjectile()
 	CollisionComp = CreateDefaultSubobject<USphereComponent>(TEXT("SphereComponent"));
 
 	CollisionComp->InitSphereRadius(DamageRadius);
+
+	CollisionComp->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+		CollisionComp->SetCollisionResponseToAllChannels(ECR_Ignore);
+		CollisionComp->SetCollisionResponseToChannel(ECC_WorldStatic, ECR_Block);
+		CollisionComp->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
 
 	RootComponent = CollisionComp;
 
@@ -39,9 +44,10 @@ void ABasicProjectile::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 }
 
-int32 ABasicProjectile::GetDamageDealt(class ABasicZombie* zombie)
+int32 ABasicProjectile::GetDamageDealt(class ABasicZombie* zombie, class AControllableSurvivor* shooter)
 {
-  return 10;
+    shooter = Owner;
+	return 10;
 }
 
 void ABasicProjectile::AddScoreFromZombie(int Score)
@@ -58,23 +64,24 @@ void ABasicProjectile::AddScoreFromZombie(int Score)
 
 void ABasicProjectile::Fire(AControllableSurvivor *owner, FRotator Direction)
 {
-  Owner = owner;
-  InitialLocation = GetActorLocation();
-  PMComp->MaxSpeed = BulletSpeed;
-  PMComp->InitialSpeed = BulletSpeed;
-  PMComp->Velocity = GetActorForwardVector() * BulletSpeed;
+	Owner = owner;
+	InitialLocation = GetActorLocation();
+	PMComp->MaxSpeed = BulletSpeed;
+	PMComp->InitialSpeed = BulletSpeed;
+	PMComp->Velocity = GetActorForwardVector() * BulletSpeed;
+	SetLifeSpan(Lifetime);
 
-  if (RootComponent)
-  {
-      const int32 NumChildren = RootComponent->GetNumChildrenComponents();
+	if (RootComponent)
+	{
+		const int32 NumChildren = RootComponent->GetNumChildrenComponents();
 
-      for (int32 i = 0; i < NumChildren; ++i)
-      {
-          USceneComponent *Child = RootComponent->GetChildComponent(i);
-          if (UStaticMeshComponent *Mesh = Cast<UStaticMeshComponent>(Child))
-          {
-              Mesh->AddRelativeRotation(Direction);
-          }
-      }
-  }
+		for (int32 i = 0; i < NumChildren; ++i)
+		{
+			USceneComponent *Child = RootComponent->GetChildComponent(i);
+			if (UStaticMeshComponent *Mesh = Cast<UStaticMeshComponent>(Child))
+			{
+				Mesh->AddRelativeRotation(Direction);
+			}
+		}
+	}
 }
