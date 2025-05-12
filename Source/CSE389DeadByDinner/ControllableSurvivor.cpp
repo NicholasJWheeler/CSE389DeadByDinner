@@ -16,6 +16,7 @@
 #include "Math/UnrealMathUtility.h" // for cursor position rotation
 #include "EnhancedInputComponent.h"
 #include "CSE389DeadByDinner/BasicProjectile.h"
+#include "CSE389DeadByDinner/BasicProjectile.h"
 
 // Sets default values
 AControllableSurvivor::AControllableSurvivor()
