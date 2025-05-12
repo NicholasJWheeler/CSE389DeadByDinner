@@ -60,10 +60,10 @@ protected:
     class AActor* OtherActor, class UPrimitiveComponent* OtherComp,
     int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
-    UFUNCTION()
-    void OnPlayerAttackOverlapEnd(class UPrimitiveComponent* OverlappedComp,
-      class AActor* OtherActor, class UPrimitiveComponent* OtherComp,
-      int32 OtherBodyIndex);
+  UFUNCTION()
+  void OnPlayerAttackOverlapEnd(class UPrimitiveComponent* OverlappedComp,
+    class AActor* OtherActor, class UPrimitiveComponent* OtherComp,
+    int32 OtherBodyIndex);
 
   bool CanAttackPlayer;
   
@@ -74,6 +74,8 @@ protected:
   FTimerHandle AttackCooldown;
 
   void AttackPlayer();
+
+  void Die();
 
 public:	
 	// Called every frame

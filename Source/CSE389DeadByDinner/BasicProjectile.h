@@ -42,7 +42,10 @@ protected:
 	FVector InitialLocation;
 
 	UPROPERTY(EditAnywhere)
-    float DamageRadius = 15.0f;
+	float DamageRadius = 15.0f;
+
+    UPROPERTY(EditAnywhere)
+    float BulletSpeed = 100.0f;
 
 public:	
 	// Called every frame
@@ -50,7 +53,7 @@ public:
 
 	int32 GetDamageDealt(class ABasicZombie* zombie);
 
-	void AddScoreFromZombie(int32 Score);
+	void AddScoreFromZombie(int Score);
 
-	void Fire(FVector Direction, class AControllableSurvivor* owner);
+	void Fire(class AControllableSurvivor *owner, FRotator Direction);
 };

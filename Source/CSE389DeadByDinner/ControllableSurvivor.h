@@ -72,6 +72,10 @@ protected:
     bool OwnsPistol;
     bool OwnsShotgun;
 
+	// Holding Classes for Blueprints
+    TSubclassOf<AActor> PistolProjClass;
+    TSubclassOf<AActor> ShotgunProjClass;
+
 	// Reload tracking
     UPROPERTY(BlueprintReadOnly, Category = "Reloading")
     bool bIsReloading;
