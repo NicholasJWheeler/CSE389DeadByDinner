@@ -632,6 +632,10 @@ void AControllableSurvivor::SetChickenCollected(int NewChickenCollected)
 void AControllableSurvivor::AddChickenCollected(int ChickenCollectedToAdd)
 {
 	ChickenCollected += ChickenCollectedToAdd;
+    if (ChickenCollectedToAdd == 20)
+    {
+        UGameplayStatics::OpenLevel(this, FName("SuccessLevel"));
+    }
 }
 
 const std::vector<AControllableSurvivor*>& AControllableSurvivor::GetSurvivorList()
