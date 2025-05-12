@@ -54,7 +54,7 @@ void ABasicZombie::BeginPlay()
 void ABasicZombie::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	if (AggroPlayer == nullptr || !AggroPlayer) {
+	if (AggroPlayer == nullptr || !AggroPlayer || !AggroPlayer->IsValidLowLevel()) {
 		// List of all survivors
 		std::vector<AControllableSurvivor*> survivors = AControllableSurvivor::GetSurvivorList();
 		if (survivors.size() > 0) {
@@ -123,7 +123,8 @@ void ABasicZombie::OnOverlapBegin(UPrimitiveComponent *OverlappedComponent, AAct
 
 void ABasicZombie::MoveToPlayer()
 {
-	if (AggroPlayer && AIController) {
+    if (AggroPlayer && AggroPlayer->IsValidLowLevel() && AggroPlayer->GetHealth() > 0 && AIController)
+    {
 			try
 			{
 					AIController->MoveToLocation(AggroPlayer->GetActorLocation(), StoppingDistance, true);
