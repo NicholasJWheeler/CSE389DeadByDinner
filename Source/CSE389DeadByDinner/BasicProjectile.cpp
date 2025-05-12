@@ -10,16 +10,21 @@
 // Sets default values
 ABasicProjectile::ABasicProjectile()
 {
-  // Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-  PrimaryActorTick.bCanEverTick = true;
+	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	PrimaryActorTick.bCanEverTick = false;
 
-  RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("ProjectileSceneComponent"));
+	RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("ProjectileSceneComponent"));
 
-  CollisionComp = CreateDefaultSubobject<USphereComponent>(TEXT("SphereComponent"));
+	CollisionComp = CreateDefaultSubobject<USphereComponent>(TEXT("SphereComponent"));
 
-  CollisionComp->InitSphereRadius(DamageRadius);
+	CollisionComp->InitSphereRadius(DamageRadius);
 
-  RootComponent = CollisionComp;
+	RootComponent = CollisionComp;
+
+	PMComp = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileMovement"));
+	PMComp->bRotationFollowsVelocity = true;
+	PMComp->bShouldBounce = false;
+	PMComp->ProjectileGravityScale = 0.f; // No gravity by default
 }
 
 // Called when the game starts or when spawned
@@ -39,13 +44,37 @@ int32 ABasicProjectile::GetDamageDealt(class ABasicZombie* zombie)
   return 10;
 }
 
-void ABasicProjectile::AddScoreFromZombie(int32 Score)
+void ABasicProjectile::AddScoreFromZombie(int Score)
 {
-  Owner->AddScore(Score);
+	if (Owner)
+	{
+		Owner->AddScore(Score);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Projectile has no Owner when trying to add score."));
+	}
 }
 
-void ABasicProjectile::Fire(FVector Direction, AControllableSurvivor* owner)
+void ABasicProjectile::Fire(AControllableSurvivor *owner, FRotator Direction)
 {
   Owner = owner;
-  InitialLocation = Owner->GetActorLocation();
+  InitialLocation = GetActorLocation();
+  PMComp->MaxSpeed = BulletSpeed;
+  PMComp->InitialSpeed = BulletSpeed;
+  PMComp->Velocity = GetActorForwardVector() * BulletSpeed;
+
+  if (RootComponent)
+  {
+      const int32 NumChildren = RootComponent->GetNumChildrenComponents();
+
+      for (int32 i = 0; i < NumChildren; ++i)
+      {
+          USceneComponent *Child = RootComponent->GetChildComponent(i);
+          if (UStaticMeshComponent *Mesh = Cast<UStaticMeshComponent>(Child))
+          {
+              Mesh->AddRelativeRotation(Direction);
+          }
+      }
+  }
 }

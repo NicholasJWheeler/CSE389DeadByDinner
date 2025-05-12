@@ -102,10 +102,20 @@ void ABasicZombie::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 void ABasicZombie::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& Hit)
 {
 	// Need to probably change this to get accurate player damage taken
-  ABasicProjectile* projectile = Cast<ABasicProjectile>(OtherActor);
-	if (projectile) {
-		Health -= projectile->GetDamageDealt(this);
-	}
+    if (ABasicProjectile *proj = Cast<ABasicProjectile>(OtherActor))
+    {
+        int32 damage = proj->GetDamageDealt(this);
+        if ((Health - damage) <= 0)
+        {
+            proj->AddScoreFromZombie(100);
+            Die();
+        } else
+        {
+            proj->AddScoreFromZombie(10);
+        }
+        Health -= damage;
+        proj->Destroy();
+    }
 
 	// UE_LOG(LogTemp, Warning, TEXT("Health: %d"), Health);
 }
@@ -131,6 +141,7 @@ void ABasicZombie::OnAIMoveCompleted(struct FAIRequestID, const struct FPathFoll
 {
   StopSeekingPlayer();
 }
+
 
 void ABasicZombie::OnPlayerAttackOverlapBegin(class UPrimitiveComponent* OverlappedComp,
   class AActor* OtherActor, class UPrimitiveComponent* OtherComp,
@@ -160,4 +171,11 @@ void ABasicZombie::AttackPlayer()
   }
 
   //CurrentlyAttackingPlayer = false; // Do not continuously keep the attacking animation
+}
+
+void ABasicZombie::Die()
+{
+    DisableAI = true;
+    PrimaryActorTick.bCanEverTick = false;
+    this->Destroy();
 }

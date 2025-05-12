@@ -15,6 +15,7 @@
 #include "Math/Plane.h" 
 #include "Math/UnrealMathUtility.h" // for cursor position rotation
 #include "EnhancedInputComponent.h"
+#include "CSE389DeadByDinner/BasicProjectile.h"
 
 // Sets default values
 AControllableSurvivor::AControllableSurvivor()
@@ -41,6 +42,11 @@ AControllableSurvivor::AControllableSurvivor()
     OwnsPistol = true;
     OwnsShotgun = true;
 
+	// Getting reference to Bullet BP
+    static ConstructorHelpers::FClassFinder<ABasicProjectile> PistolProjBP(
+        TEXT("/Game/Blueprints/BP_PistolProjectile"));
+    if (PistolProjBP.Class != nullptr)
+        PistolProjClass = PistolProjBP.Class;
 }
 
 // Called when the game starts or when spawned
@@ -245,6 +251,24 @@ void AControllableSurvivor::Shoot()
                         }
                     },
                     EffectLifetime, false);
+            }
+        }
+
+		if (PistolProjClass != nullptr)
+        {
+            // Transform the offset from local to world space
+            FVector WorldOffset = CharacterRotation.RotateVector(PistolMuzzleOffset);
+
+            // Calculate final world position
+            FVector WorldPosition = GetActorLocation() + WorldOffset;
+            FRotator BulletRotation = CharacterRotation;
+
+            ABasicProjectile *Bullet =
+                GetWorld()->SpawnActor<ABasicProjectile>(PistolProjClass, WorldPosition, BulletRotation);
+
+            if (Bullet)
+            {
+                Bullet->Fire(this, BulletRotation);
             }
         }
 
