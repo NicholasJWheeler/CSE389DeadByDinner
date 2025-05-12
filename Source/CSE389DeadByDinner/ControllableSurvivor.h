@@ -72,6 +72,25 @@ protected:
     bool OwnsPistol;
     bool OwnsShotgun;
 
+	// Reload tracking
+    UPROPERTY(BlueprintReadOnly, Category = "Reloading")
+    bool bIsReloading;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Reloading")
+    float PistolReloadTime = 1.5f; // Time in seconds to reload pistol
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Reloading")
+    float ShotgunReloadTime = 2.5f; // Time in seconds to reload shotgun (5 shell reload audio)
+
+    UPROPERTY(BlueprintReadOnly, Category = "Reloading")
+    float ReloadPercentage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Audio")
+    USoundBase *PistolReloadSound;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Audio")
+    USoundBase *ShotgunReloadSound;
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -155,6 +174,20 @@ public:
 	// Set the amount of pistol ammo loaded
 	UFUNCTION(BlueprintCallable, Category = "Ammo")
 	void SetPistolLoadedAmmo(int LoadedAmmo);
+
+	// Reload function
+    UFUNCTION(BlueprintCallable, Category = "Weapon")
+    void Reload();
+
+    // Get reload status for UI (0.0 to 1.0)
+    UFUNCTION(BlueprintCallable, Category = "Weapon")
+    float GetReloadStatus();
+
+    // Constants for max ammo
+    static const int MAX_PISTOL_LOADED_AMMO = 9;
+    static const int MAX_PISTOL_RESERVE_AMMO = 180;
+    static const int MAX_SHOTGUN_LOADED_AMMO = 5;
+    static const int MAX_SHOTGUN_RESERVE_AMMO = 60;
 
 	// WEAPON FUNCTIONS
 
