@@ -47,6 +47,10 @@ AControllableSurvivor::AControllableSurvivor()
         TEXT("/Game/Blueprints/BP_PistolProjectile"));
     if (PistolProjBP.Class != nullptr)
         PistolProjClass = PistolProjBP.Class;
+    static ConstructorHelpers::FClassFinder<ABasicProjectile> ShotgunProjBP(
+        TEXT("/Game/Blueprints/BP_ShotgunProjectile"));
+    if (ShotgunProjBP.Class != nullptr)
+        ShotgunProjClass = ShotgunProjBP.Class;
 }
 
 // Called when the game starts or when spawned
@@ -398,6 +402,36 @@ void AControllableSurvivor::Shoot()
                         EffectLifetime, false);
                 }
             }
+
+		if (ShotgunProjClass != nullptr)
+        {
+            // Transform the offset from local to world space
+            FVector WorldOffset = CharacterRotation.RotateVector(ShotgunMuzzleOffset);
+
+            // Calculate final world position
+            FVector WorldPosition = GetActorLocation() + WorldOffset;
+            FRotator BaseRotation = CharacterRotation;
+
+            int NumShots = 5;
+            std::vector<ABasicProjectile *> Shots(NumShots);
+
+            float SpreadAngle = 20.0f; // Degrees
+
+            for (int i = 0; i < NumShots; i++)
+            {
+                // Random yaw and pitch offset within [-SpreadAngle/2, +SpreadAngle/2]
+                float YawOffset = FMath::FRandRange(-SpreadAngle / 2.0f, SpreadAngle / 2.0f);
+                //float PitchOffset = FMath::FRandRange(-SpreadAngle / 2.0f, SpreadAngle / 2.0f);
+                FRotator SpreadRotation = BaseRotation.Add(0.0f, YawOffset, 0.0f); // Roll stays unchanged
+
+                ABasicProjectile *Shot =
+                    GetWorld()->SpawnActor<ABasicProjectile>(ShotgunProjClass, WorldPosition, SpreadRotation);
+                if (Shot)
+                {
+                    Shot->Fire(this, SpreadRotation);
+                }
+            }
+        }
 
             // Play shotgun sound safely with cooldown to prevent audio overload
             static float LastShotgunSoundTime = 0.0f;

@@ -47,11 +47,14 @@ protected:
     UPROPERTY(EditAnywhere)
     float BulletSpeed = 100.0f;
 
+	UPROPERTY(EditAnywhere)
+    float Lifetime = 3.0f;
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	int32 GetDamageDealt(class ABasicZombie* zombie);
+	int32 GetDamageDealt(class ABasicZombie *zombie, class AControllableSurvivor* shooter);
 
 	void AddScoreFromZombie(int Score);
 
