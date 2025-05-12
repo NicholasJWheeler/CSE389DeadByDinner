@@ -7,6 +7,11 @@
 #include "EnhancedInputSubsystems.h"
 #include "Logging/LogMacros.h"
 #include "Kismet/GameplayStatics.h"
+#include "NiagaraFunctionLibrary.h"
+#include "NiagaraComponent.h"
+#include "NiagaraSystem.h"
+#include "Sound/SoundBase.h"
+#include "TimerManager.h"
 #include "Math/Plane.h" 
 #include "Math/UnrealMathUtility.h" // for cursor position rotation
 #include "EnhancedInputComponent.h"
@@ -21,9 +26,9 @@ AControllableSurvivor::AControllableSurvivor()
 	Score = 0; // Start with no points (skulls = zombies killed)
 	ChickenCollected = 0; // Start with no food collected
 	Health = 100; // Start with full health
-	PistolLoadedAmmo = 0; // Start with no loaded pistol ammo
+	PistolLoadedAmmo = 100; // Start with no loaded pistol ammo
 	PistolReserveAmmo = 0; // Start with no reserve pistol ammo
-	ShotgunLoadedAmmo = 0; // Start with no loaded shotgun ammo
+	ShotgunLoadedAmmo = 100; // Start with no loaded shotgun ammo
 	ShotgunReserveAmmo = 0; // Start with no reserve shotgun ammo
 
 	// Starting weapon is nothing
@@ -130,7 +135,7 @@ void AControllableSurvivor::SetupPlayerInputComponent(UInputComponent* PlayerInp
 	// Bind the actions
 	PEI->BindAction(InputMove, ETriggerEvent::Triggered, this, &AControllableSurvivor::Move);
 	PEI->BindAction(InputLook, ETriggerEvent::Triggered, this, &AControllableSurvivor::Look);
-	PEI->BindAction(InputShoot, ETriggerEvent::Triggered, this, &AControllableSurvivor::Shoot);
+	PEI->BindAction(InputShoot, ETriggerEvent::Started, this, &AControllableSurvivor::Shoot);
 
 }
 
@@ -183,13 +188,150 @@ void AControllableSurvivor::Look(const FInputActionValue& Value)
 // Spawn in unique projectiles based on if pistol or shotgun is equipped
 void AControllableSurvivor::Shoot()
 {
-	// If no gun equipped, do nothing
+    // Don't do anything if unarmed
+    if (UnarmedEquipped)
+    {
+        //UE_LOG(LogTemp, Warning, TEXT("Unarmed is equipped, so do nothing!"));
+        return;
+    }
+
+    // Set correct offsets from player for gun muzzle flashes
+    FVector PistolMuzzleOffset(112.0f, 8.0f, 26.0f);  // Forward, Right, Up
+    FVector ShotgunMuzzleOffset(98.0f, 10.0f, 20.0f); // Forward, Right, Up
+
+    // Get the character's rotation
+    FRotator CharacterRotation = GetActorRotation();
+
+    // PISTOL SHOOTING
+    if (PistolEquipped && PistolLoadedAmmo > 0)
+    {
+        // Spawn pistol muzzle flash effect
+        UNiagaraSystem *PistolMuzzleFlash = LoadObject<UNiagaraSystem>(
+            nullptr, TEXT("/Game/MuzzleFlash/MuzzleFlash/Niagara/NS_PistolMuzzleFlash.NS_PistolMuzzleFlash"));
+
+        if (PistolMuzzleFlash)
+        {
+            // Transform the offset from local to world space
+            FVector WorldOffset = CharacterRotation.RotateVector(PistolMuzzleOffset);
+
+            // Calculate final world position
+            FVector WorldPosition = GetActorLocation() + WorldOffset;
+            FRotator EmitterRotation = CharacterRotation;
+            EmitterRotation.Yaw -= 90.0f; // Rotate -90 degrees around Z axis to align with forward since emitter doesn't shoot down forward vector
+
+            // Create a niagara component at the world location with the adjusted rotation
+            UNiagaraComponent *NiagaraComp =
+                UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), PistolMuzzleFlash,
+                                                               WorldPosition,      // World position
+                                                               EmitterRotation,    // Adjusted rotation
+                                                               FVector(1.0f),      // Scale
+                                                               true,               // Auto destroy
+                                                               true,               // Auto activate
+                                                               ENCPoolMethod::None // Pool method
+                );
+
+            if (NiagaraComp)
+            {
+                float EffectLifetime = 0.24f; // 0.24 seconds until end of particle effect
+                FTimerHandle TimerHandle;
+                GetWorld()->GetTimerManager().SetTimer(
+                    TimerHandle,
+                    [NiagaraComp]()
+                    {
+                        if (NiagaraComp && !NiagaraComp->IsBeingDestroyed())
+                        {
+                            NiagaraComp->DeactivateImmediate();
+                            NiagaraComp->DestroyComponent();
+                        }
+                    },
+                    EffectLifetime, false);
+            }
+        }
+
+        // Play pistol sound safely with cooldown to prevent audio overload
+        static float LastPistolSoundTime = 0.0f;
+        float CurrentTime = GetWorld()->GetTimeSeconds();
+        if (CurrentTime - LastPistolSoundTime > 0.1f) // 0.1 second cooldown between sounds
+        {
+            USoundBase *PistolSound =
+                LoadObject<USoundBase>(nullptr, TEXT("/Game/Audio/GunSounds/PistolShooting.PistolShooting"));
+            if (PistolSound)
+            {
+                UGameplayStatics::PlaySound2D(GetWorld(), PistolSound, 0.7f, 1.0f, 0.0f);
+                LastPistolSoundTime = CurrentTime;
+            }
+        }
+
+        // Decrease ammo
+        PistolLoadedAmmo--;
+    }
+    // SHOTGUN SHOOTING
+    else if (ShotgunEquipped && ShotgunLoadedAmmo > 0)
+    {
+        // Spawn shotgun muzzle flash effect
+        UNiagaraSystem *ShotgunMuzzleFlash = LoadObject<UNiagaraSystem>(
+            nullptr, TEXT("/Game/MuzzleFlash/MuzzleFlash/Niagara/NS_ShotgunMuzzleFlash.NS_ShotgunMuzzleFlash"));
+
+        if (ShotgunMuzzleFlash)
+        {
+            // Transform the offset from local to world space
+            FVector WorldOffset = CharacterRotation.RotateVector(ShotgunMuzzleOffset);
+
+            // Calculate final world position
+            FVector WorldPosition = GetActorLocation() + WorldOffset;
+            FRotator EmitterRotation = CharacterRotation;
+            EmitterRotation.Yaw -= 90.0f; // Rotate -90 degrees around Z axis to align with forward since emitter doesn't shoot down forward vector
+
+            // Create a niagara component at the world location with the adjusted rotation
+            UNiagaraComponent *NiagaraComp =
+                UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), ShotgunMuzzleFlash,
+                                                               WorldPosition,      // World position
+                                                               EmitterRotation,    // Adjusted rotation
+                                                               FVector(1.0f),      // Scale
+                                                               true,               // Auto destroy
+                                                               true,               // Auto activate
+                                                               ENCPoolMethod::None // Pool method
+                );
+
+            if (NiagaraComp)
+            {
+                float EffectLifetime = 0.24f; // 0.24 seconds until end of particle effect
+                FTimerHandle TimerHandle;
+                GetWorld()->GetTimerManager().SetTimer(
+                    TimerHandle,
+                    [NiagaraComp]()
+                    {
+                        if (NiagaraComp && !NiagaraComp->IsBeingDestroyed())
+                        {
+                            NiagaraComp->DeactivateImmediate();
+                            NiagaraComp->DestroyComponent();
+                        }
+                    },
+                    EffectLifetime, false);
+            }
+        }
+
+        // Play shotgun sound safely with cooldown to prevent audio overload
+        static float LastShotgunSoundTime = 0.0f;
+        float CurrentTime = GetWorld()->GetTimeSeconds();
+        if (CurrentTime - LastShotgunSoundTime > 0.15f) // 0.15 second cooldown between sounds
+        {
+            USoundBase *ShotgunSound =
+                LoadObject<USoundBase>(nullptr, TEXT("/Game/Audio/GunSounds/ShotgunShoot.ShotgunShoot"));
+            if (ShotgunSound)
+            {
+                UGameplayStatics::PlaySound2D(GetWorld(), ShotgunSound, 0.7f, 1.0f, 0.0f);
+                LastShotgunSoundTime = CurrentTime;
+            }
+        }
+
+        // Decrease ammo
+        ShotgunLoadedAmmo--;
+    }
+
+	// PROJECTILES STUFF
 	// If pistol equipped, shoot 1 bullet per click, spawn small explosion niagra effect at gun barrel
 	// If shotgun equipped, shoot 5 bullets in a short range star pattern, spawn cone niagra explosion effect at gun barrel
-
-
-
-
 
 
 	// Set ProjectileSpawn to spawn projectiles slightly in front of the character
