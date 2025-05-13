@@ -514,7 +514,11 @@ int AControllableSurvivor::GetHealth()
 
 void AControllableSurvivor::SubtractHealth(int HealthToSubtract)
 {
-	Health -= HealthToSubtract;
+	Health -= HealthToSubtract; }
+
+void AControllableSurvivor::SetHealth(int NewHealth) 
+{ 
+    Health = NewHealth; 
 }
 
 

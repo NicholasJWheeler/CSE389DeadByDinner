@@ -148,6 +148,10 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Health")
 	void SubtractHealth(int HealthToSubtract);
 
+	// Subtract from health variable
+    UFUNCTION(BlueprintCallable, Category = "Health")
+    void SetHealth(int NewHealth);
+
 	// AMMO FUNCTIONS
 
 	// Get the amount of pistol ammo in reserve
