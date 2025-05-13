@@ -28,10 +28,10 @@ AControllableSurvivor::AControllableSurvivor()
 	Score = 0; // Start with no points (skulls = zombies killed)
 	ChickenCollected = 0; // Start with no food collected
 	Health = 100; // Start with full health
-	PistolLoadedAmmo = 9; // Start with some pistol ammo (MAX 9)
-	PistolReserveAmmo = 144; // Start with some reserve pistol ammo (MAX 180)
-	ShotgunLoadedAmmo = 5; // Start with some shotgun shells (MAX 5)
-	ShotgunReserveAmmo = 30; // Start with some reserve shells (MAX 60)
+	PistolLoadedAmmo = 0; // Start with some pistol ammo (MAX 9) OR no ammo at all
+	PistolReserveAmmo = 0; // Start with some reserve pistol ammo (MAX 180) OR no ammo at all
+	ShotgunLoadedAmmo = 0; // Start with some shotgun shells (MAX 5) OR no ammo at all
+	ShotgunReserveAmmo = 0; // Start with some reserve shells (MAX 60) OR no ammo at all
 
 	// Starting weapon is nothing
 	UnarmedEquipped = true;
@@ -40,8 +40,8 @@ AControllableSurvivor::AControllableSurvivor()
 
 	// Starting weapons owned/accessible
     OwnsUnarmed = true;
-    OwnsPistol = true;
-    OwnsShotgun = true;
+    OwnsPistol = false;
+    OwnsShotgun = false;
 
 	// Getting reference to Bullet BP
     static ConstructorHelpers::FClassFinder<ABasicProjectile> PistolProjBP(
