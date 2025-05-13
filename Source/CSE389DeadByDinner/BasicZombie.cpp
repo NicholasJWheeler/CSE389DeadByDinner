@@ -47,7 +47,8 @@ void ABasicZombie::BeginPlay()
 	}
 
 	AIController = Cast<AZombieAIController>(GetController());
-	AIController->GetPathFollowingComponent()->OnRequestFinished.AddUObject(this, &ABasicZombie::OnAIMoveCompleted);
+    if (AIController)
+		AIController->GetPathFollowingComponent()->OnRequestFinished.AddUObject(this, &ABasicZombie::OnAIMoveCompleted);
 }
 
 // Called every frame
@@ -55,6 +56,7 @@ void ABasicZombie::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 	if (AggroPlayer == nullptr || !AggroPlayer || !AggroPlayer->IsValidLowLevel()) {
+            UE_LOG(LogTemp, Warning, TEXT("Searching for valid target"));
 		// List of all survivors
 		std::vector<AControllableSurvivor*> survivors = AControllableSurvivor::GetSurvivorList();
 		if (survivors.size() > 0) {
@@ -63,7 +65,7 @@ void ABasicZombie::Tick(float DeltaTime)
 
 			// Gathers candidate survivors
 			std::for_each(survivors.begin(), survivors.end(), [&candidates](auto& x){
-				if (x->GetHealth() > 0) {
+				if (x->GetHealth() > 0 && x->IsValidLowLevel()) {
 					candidates.push_back(x);
 				}
 			});
