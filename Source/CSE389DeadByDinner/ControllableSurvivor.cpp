@@ -681,6 +681,7 @@ void AControllableSurvivor::SetScore(int NewScore)
 void AControllableSurvivor::AddScore(int ScoreToAdd)
 {
 	Score += ScoreToAdd;
+    UE_LOG(LogTemp, Warning, TEXT("Added score: %d"), ScoreToAdd);
 }
 
 void AControllableSurvivor::SetChickenCollected(int NewChickenCollected)
