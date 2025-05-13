@@ -116,11 +116,11 @@ void ABasicZombie::OnOverlapBegin(UPrimitiveComponent *OverlappedComponent, AAct
 
 				if ((Health - damage) <= 0)
 				{
-						proj->AddScoreFromZombie(100);
+						proj->AddScoreFromZombie(1);
 						Die();
 				} else
 				{
-						proj->AddScoreFromZombie(10);
+						proj->AddScoreFromZombie(0);
 				}
 				Health -= damage;
 				proj->Destroy();
