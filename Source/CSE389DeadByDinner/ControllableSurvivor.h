@@ -22,6 +22,9 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Audio")
 	USoundBase* CollectSound;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Audio")
+    USoundBase *DamageTakenSound;
+
 protected:
   // Used for querying survivors by zombies
   inline static std::vector<AControllableSurvivor*> Survivors = std::vector<AControllableSurvivor*>();

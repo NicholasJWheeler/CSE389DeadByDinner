@@ -707,6 +707,10 @@ void AControllableSurvivor::DealDamage(int32 Damage, FString DamageSource)
 {
     Health -= Damage;
     std::string out = std::string(TCHAR_TO_UTF8(*DamageSource));
+    if (DamageTakenSound)
+    {
+        UGameplayStatics::PlaySoundAtLocation(this, DamageTakenSound, GetActorLocation());
+    }
     UE_LOG(LogTemp, Warning, TEXT("Took %d damage from %s"), Damage, *FString(out.c_str()));
     if (Health <= 0)
     {

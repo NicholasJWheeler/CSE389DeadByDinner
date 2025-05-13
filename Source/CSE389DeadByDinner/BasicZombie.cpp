@@ -8,6 +8,7 @@
 #include "GameFramework/Actor.h"
 #include "Components/BoxComponent.h"
 #include "AITypes.h"
+#include "Kismet/GameplayStatics.h"
 #include "Navigation/PathFollowingComponent.h"
 #include "TimerManager.h"
 #include "ZombieAIController.h"
@@ -108,6 +109,11 @@ void ABasicZombie::OnOverlapBegin(UPrimitiveComponent *OverlappedComponent, AAct
 		if (ABasicProjectile *proj = Cast<ABasicProjectile>(OtherActor))
 		{
 				int32 damage = proj->GetDamageDealt(this, LastAttackedBy);
+                if (HitSound)
+                {
+                    UGameplayStatics::PlaySoundAtLocation(this, HitSound, GetActorLocation());
+                }
+
 				if ((Health - damage) <= 0)
 				{
 						proj->AddScoreFromZombie(100);
@@ -179,6 +185,11 @@ void ABasicZombie::AttackPlayer()
 	if (CanAttackPlayer && AggroPlayer) {
 		CurrentlyAttackingPlayer = true; // Start an attack animation
 		AggroPlayer->DealDamage(10, TEXT("Basic Zombie"));
+        if (AttackSound)
+        {
+            UGameplayStatics::PlaySoundAtLocation(this, AttackSound, GetActorLocation());
+        }
+
 	}
 
 	//CurrentlyAttackingPlayer = false; // Do not continuously keep the attacking animation
@@ -186,6 +197,10 @@ void ABasicZombie::AttackPlayer()
 
 void ABasicZombie::Die()
 {
+		if (DeathSound)
+		{
+			UGameplayStatics::PlaySoundAtLocation(this, DeathSound, GetActorLocation());
+		}
 		DisableAI = true;
 		PrimaryActorTick.bCanEverTick = false;
 		this->Destroy();
