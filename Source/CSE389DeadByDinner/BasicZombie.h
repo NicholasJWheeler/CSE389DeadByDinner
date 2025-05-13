@@ -5,6 +5,7 @@
 #include "CSE389DeadByDinner/ZombieAIController.h"
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "Components/BoxComponent.h"
 #include "BasicZombie.generated.h"
 
