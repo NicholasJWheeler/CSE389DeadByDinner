@@ -56,6 +56,7 @@ void ABasicZombie::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 	if (AggroPlayer == nullptr || !AggroPlayer || !AggroPlayer->IsValidLowLevel()) {
+            UE_LOG(LogTemp, Warning, TEXT("Searching for valid target"));
 		// List of all survivors
 		std::vector<AControllableSurvivor*> survivors = AControllableSurvivor::GetSurvivorList();
 		if (survivors.size() > 0) {
