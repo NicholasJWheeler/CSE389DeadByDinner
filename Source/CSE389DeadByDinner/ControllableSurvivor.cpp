@@ -696,7 +696,7 @@ void AControllableSurvivor::SetChickenCollected(int NewChickenCollected)
 void AControllableSurvivor::AddChickenCollected(int ChickenCollectedToAdd)
 {
 	ChickenCollected += ChickenCollectedToAdd;
-    if (ChickenCollectedToAdd == 20)
+    if (ChickenCollected == 20)
     {
         UGameplayStatics::OpenLevel(this, FName("SuccessLevel"));
     }
