@@ -76,6 +76,12 @@ protected:
     int32 OtherBodyIndex);
 
   bool CanAttackPlayer;
+
+  int32 StuckTicks = 0;
+  FVector LastLocation;
+  float MovementThreshold = 5.0f;
+
+  void Unstuck();
   
   // For animation purposes
   UPROPERTY(EditAnywhere, BlueprintReadWrite)

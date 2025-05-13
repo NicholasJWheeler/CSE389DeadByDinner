@@ -56,6 +56,23 @@ void ABasicZombie::BeginPlay()
 void ABasicZombie::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	FVector CurrentLocation = GetActorLocation();
+	//float DistanceMoved = FVector::DistSquared(CurrentLocation, LastLocation);
+	if (CurrentLocation.Z < 190.0f)
+	{
+		if (++StuckTicks > 10)
+			{
+                Unstuck();
+                StuckTicks = 0;
+			}
+	}
+	else {
+            StuckTicks = 0;
+	}
+
+	LastLocation = CurrentLocation;
+
 	if (AggroPlayer == nullptr || !AggroPlayer || !AggroPlayer->IsValidLowLevel()) {
             UE_LOG(LogTemp, Warning, TEXT("Searching for valid target"));
 		// List of all survivors
@@ -177,6 +194,22 @@ void ABasicZombie::OnPlayerAttackOverlapEnd(class UPrimitiveComponent* Overlappe
 {
 	CurrentlyAttackingPlayer = false; // Do not continuously keep the attacking animation
 	GetWorld()->GetTimerManager().ClearTimer(AttackCooldown);
+}
+
+void ABasicZombie::Unstuck() {
+    UE_LOG(LogTemp, Warning, TEXT("Unstuck Zombie"));
+    FVector CurrentLocation = GetActorLocation();
+    FVector UnstuckLocation = CurrentLocation + FVector(0, 0, 50.0f); // move 50 units up
+
+    SetActorLocation(UnstuckLocation, false, nullptr, ETeleportType::TeleportPhysics);
+
+    // Optional: force falling mode in case they were stuck on something
+    if (GetCharacterMovement())
+    {
+        GetCharacterMovement()->SetMovementMode(MOVE_Falling);
+    }
+
+    UE_LOG(LogTemp, Warning, TEXT("Zombie was unstuck at: %s"), *UnstuckLocation.ToString());
 }
 
 void ABasicZombie::AttackPlayer()
